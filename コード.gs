@@ -182,8 +182,16 @@ function reviseDailyReportText() {
 
 // 毎日9時に本日の日報欄を作る関数
 function insertDailyReportTemplate() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("日報");
   const today = new Date();
+  const dayOfWeek = today.getDay(); // 0 = 日曜日, 1 = 月曜日, ..., 6 = 土曜日
+
+  // 週末（土曜日または日曜日）の場合は処理を終了
+  if (dayOfWeek === 6 || dayOfWeek === 0) {
+    Logger.log("週末のため、日報テンプレートの作成をスキップします。");
+    return;
+  }
+  
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("日報");
   const formattedDate = Utilities.formatDate(today, "Asia/Tokyo", "yyyy/MM/dd");
 
   // テンプレート行（名前以外は空欄でOK）
@@ -200,6 +208,7 @@ function insertDailyReportTemplate() {
   ];
 
   sheet.appendRow(newRow);
+  Logger.log(`日報テンプレートを作成しました: ${formattedDate}`);
 }
 
 //日報を送る関数
@@ -248,21 +257,18 @@ function sendTodaysDailyReport() {
 ●今日の感想や気づいた点
 ────────────────────────────────────
 ${reflection}
-
+────────────────────────────────────
 ●今日の行動５者
 ────────────────────────────────────
 ${fiveAct}
-
+────────────────────────────────────
 ●今日の業務内容のまとめ
 ────────────────────────────────────
 ${summary}
-
+────────────────────────────────────
 ●明日のスケジュール／ＴＯＤＯ
 ────────────────────────────────────
-スケジュール：
 ${schedule}
-
-ＴＯＤＯ：
 ${todo}
 
 ────────────────────────────────────
